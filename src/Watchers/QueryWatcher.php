@@ -28,6 +28,10 @@ class QueryWatcher extends Watcher
      */
     public function recordQuery(QueryExecuted $event)
     {
+        if (! Telescope::isRecording()) {
+            return;
+        }
+
         $time = $event->time;
 
         $caller = $this->getCallerFromStackTrace();
@@ -80,8 +84,20 @@ class QueryWatcher extends Watcher
             }
 
             return ! Str::contains($frame['file'],
-                base_path('vendor'.DIRECTORY_SEPARATOR.'laravel')
+                base_path('vendor'.DIRECTORY_SEPARATOR.$this->ignoredVendorPath())
             );
         });
+    }
+
+    /**
+     * Choose the frame outside of either Telescope/Laravel or all packages.
+     *
+     * @return string|null
+     */
+    protected function ignoredVendorPath()
+    {
+        if (! ($this->options['ignore_packages'] ?? true)) {
+            return 'laravel';
+        }
     }
 }

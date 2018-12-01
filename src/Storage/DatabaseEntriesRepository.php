@@ -7,7 +7,6 @@ use Laravel\Telescope\EntryType;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Laravel\Telescope\EntryResult;
-use Illuminate\Support\Facades\Schema;
 use Laravel\Telescope\Contracts\PrunableRepository;
 use Laravel\Telescope\Contracts\ClearableRepository;
 use Laravel\Telescope\Contracts\TerminableRepository;
@@ -80,7 +79,9 @@ class DatabaseEntriesRepository implements Contract, ClearableRepository, Prunab
             ->withTelescopeOptions($type, $options)
             ->take($options->limit)
             ->orderByDesc('sequence')
-            ->get()->map(function ($entry) {
+            ->get()->reject(function ($entry) {
+                return ! is_array($entry->content);
+            })->map(function ($entry) {
                 return new EntryResult(
                     $entry->uuid,
                     $entry->sequence,
