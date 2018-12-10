@@ -4,7 +4,6 @@ namespace Laravel\Telescope\Watchers;
 
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\IncomingEntry;
-use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Console\Events\CommandFinished;
 
 class CommandWatcher extends Watcher
@@ -37,7 +36,6 @@ class CommandWatcher extends Watcher
             'exit_code' => $event->exitCode,
             'arguments' => $event->input->getArguments(),
             'options' => $event->input->getOptions(),
-            'output' => app(Kernel::class)->output(),
         ]));
     }
 

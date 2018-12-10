@@ -3,9 +3,9 @@
 namespace Laravel\Telescope\Http\Controllers;
 
 use Laravel\Telescope\EntryType;
-use Laravel\Telescope\Watchers\EventWatcher;
+use Laravel\Telescope\Watchers\GateWatcher;
 
-class EventsController extends EntryController
+class GatesController extends EntryController
 {
     /**
      * The entry type for the controller.
@@ -14,7 +14,7 @@ class EventsController extends EntryController
      */
     protected function entryType()
     {
-        return EntryType::EVENT;
+        return EntryType::GATE;
     }
 
     /**
@@ -24,6 +24,6 @@ class EventsController extends EntryController
      */
     protected function watcher()
     {
-        return EventWatcher::class;
+        return GateWatcher::class;
     }
 }

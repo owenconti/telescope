@@ -168,4 +168,16 @@ export default [
         name: 'monitored-tags',
         component: require('./screens/monitoring/index')
     },
+
+    {
+        path: '/gates/:id',
+        name: 'gate-preview',
+        component: require('./screens/gates/preview')
+    },
+
+    {
+        path: '/gates',
+        name: 'gates',
+        component: require('./screens/gates/index')
+    },
 ];

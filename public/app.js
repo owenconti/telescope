@@ -1756,6 +1756,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             familyHash: '',
             entries: [],
             ready: false,
+            recordingStatus: 'enabled',
             lastEntryIndex: '',
             hasMoreEntries: true,
             hasNewEntries: false,
@@ -1852,6 +1853,8 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
                 _this3.hasMoreEntries = response.data.entries.length >= _this3.entriesPerRequest;
 
+                _this3.recordingStatus = response.data.status;
+
                 if (__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.isFunction(after)) {
                     after(_this3.familyHash ? response.data.entries : __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.uniqBy(response.data.entries, function (entry) {
                         return entry.family_hash || __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.uniqueId();
@@ -1869,6 +1872,8 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
             this.newEntriesTimeout = setTimeout(function () {
                 __WEBPACK_IMPORTED_MODULE_2_axios___default.a.post('/' + Telescope.path + '/telescope-api/' + _this4.resource + '?tag=' + _this4.tag + '&take=1' + '&family_hash=' + _this4.familyHash).then(function (response) {
+                    _this4.recordingStatus = response.data.status;
+
                     if (response.data.entries.length && !_this4.entries.length) {
                         _this4.loadNewEntries();
                     } else if (response.data.entries.length && __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.first(response.data.entries).id !== __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.first(_this4.entries).id) {
@@ -1976,6 +1981,8 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
                     __WEBPACK_IMPORTED_MODULE_2_axios___default.a.post('/' + Telescope.path + '/telescope-api/' + _this9.resource, {
                         uuids: uuids
                     }).then(function (response) {
+                        _this9.recordingStatus = response.data.status;
+
                         _this9.entries = __WEBPACK_IMPORTED_MODULE_1_lodash___default.a.map(_this9.entries, function (entry) {
                             if (!__WEBPACK_IMPORTED_MODULE_1_lodash___default.a.includes(uuids, entry.id)) return entry;
 
@@ -2209,6 +2216,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 this.currentTab = 'events';
             } else if (this.cache.length) {
                 this.currentTab = 'cache';
+            } else if (this.gates.length) {
+                this.currentTab = 'gates';
             } else if (this.redis.length) {
                 this.currentTab = 'redis';
             }
@@ -2226,6 +2235,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         exceptions: function exceptions() {
             return _.filter(this.batch, { type: 'exception' });
+        },
+        gates: function gates() {
+            return _.filter(this.batch, { type: 'gate' });
         },
         logs: function logs() {
             return _.filter(this.batch, { type: 'log' });
@@ -2255,7 +2267,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             return _.filter(this.batch, { type: 'notification' });
         },
         tabs: function tabs() {
-            return _.filter([{ title: "Exceptions", type: "exceptions", count: this.exceptions.length }, { title: "Logs", type: "logs", count: this.logs.length }, { title: "Queries", type: "queries", count: this.queries.length }, { title: "Models", type: "models", count: this.models.length }, { title: "Jobs", type: "jobs", count: this.jobs.length }, { title: "Mail", type: "mails", count: this.mails.length }, { title: "Notifications", type: "notifications", count: this.notifications.length }, { title: "Events", type: "events", count: this.events.length }, { title: "Cache", type: "cache", count: this.cache.length }, { title: "Redis", type: "redis", count: this.redis.length }], function (tab) {
+            return _.filter([{ title: "Exceptions", type: "exceptions", count: this.exceptions.length }, { title: "Logs", type: "logs", count: this.logs.length }, { title: "Queries", type: "queries", count: this.queries.length }, { title: "Models", type: "models", count: this.models.length }, { title: "Gates", type: "gates", count: this.gates.length }, { title: "Jobs", type: "jobs", count: this.jobs.length }, { title: "Mail", type: "mails", count: this.mails.length }, { title: "Notifications", type: "notifications", count: this.notifications.length }, { title: "Events", type: "events", count: this.events.length }, { title: "Cache", type: "cache", count: this.cache.length }, { title: "Redis", type: "redis", count: this.redis.length }], function (tab) {
                 return tab.count > 0;
             });
         },
@@ -2405,7 +2417,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             entries: [],
             ready: false,
             newEntriesTimeout: null,
-            newEntriesTimeoutInSeconds: 2000
+            newEntriesTimeoutInSeconds: 2000,
+            recordingStatus: 'enabled'
         };
     },
 
@@ -2434,6 +2447,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             __WEBPACK_IMPORTED_MODULE_0_axios___default.a.post('/' + Telescope.path + '/telescope-api/dumps').then(function (response) {
                 _this.entries = response.data.entries;
+                _this.recordingStatus = response.data.status;
 
                 _this.ready = true;
 
@@ -2502,6 +2516,43 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             entry: null,
             batch: [],
             currentTab: 'message'
+        };
+    }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?{\"cacheDirectory\":true,\"presets\":[[\"env\",{\"modules\":false,\"targets\":{\"browsers\":[\"> 2%\"],\"uglify\":true}}]],\"plugins\":[\"transform-object-rest-spread\",[\"transform-runtime\",{\"polyfill\":false,\"helpers\":false}]]}!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./resources/js/screens/gates/index.vue":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mixins_entriesStyles__ = __webpack_require__("./resources/js/mixins/entriesStyles.js");
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    mixins: [__WEBPACK_IMPORTED_MODULE_0__mixins_entriesStyles__["a" /* default */]]
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?{\"cacheDirectory\":true,\"presets\":[[\"env\",{\"modules\":false,\"targets\":{\"browsers\":[\"> 2%\"],\"uglify\":true}}]],\"plugins\":[\"transform-object-rest-spread\",[\"transform-runtime\",{\"polyfill\":false,\"helpers\":false}]]}!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./resources/js/screens/gates/preview.vue":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mixins_entriesStyles__ = __webpack_require__("./resources/js/mixins/entriesStyles.js");
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    mixins: [__WEBPACK_IMPORTED_MODULE_0__mixins_entriesStyles__["a" /* default */]],
+
+    data: function data() {
+        return {
+            entry: null,
+            batch: []
         };
     }
 });
@@ -48449,6 +48500,124 @@ if (false) {
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-0a825c16\",\"hasScoped\":false,\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./resources/js/screens/gates/index.vue":
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "index-screen",
+    {
+      attrs: { title: "Gates", resource: "gates" },
+      scopedSlots: _vm._u([
+        {
+          key: "row",
+          fn: function(slotProps) {
+            return [
+              _c("td", [
+                _vm._v(
+                  _vm._s(_vm.truncate(slotProps.entry.content.ability, 80))
+                )
+              ]),
+              _vm._v(" "),
+              _c("td", { staticClass: "table-fit" }, [
+                _c(
+                  "span",
+                  {
+                    staticClass: "badge font-weight-light",
+                    class:
+                      "badge-" +
+                      _vm.gateResultClass(slotProps.entry.content.result)
+                  },
+                  [
+                    _vm._v(
+                      "\n                " +
+                        _vm._s(slotProps.entry.content.result) +
+                        "\n            "
+                    )
+                  ]
+                )
+              ]),
+              _vm._v(" "),
+              _c(
+                "td",
+                {
+                  staticClass: "table-fit",
+                  attrs: { "data-timeago": slotProps.entry.created_at }
+                },
+                [_vm._v(_vm._s(_vm.timeAgo(slotProps.entry.created_at)))]
+              ),
+              _vm._v(" "),
+              _c(
+                "td",
+                { staticClass: "table-fit" },
+                [
+                  _c(
+                    "router-link",
+                    {
+                      staticClass: "control-action",
+                      attrs: {
+                        to: {
+                          name: "gate-preview",
+                          params: { id: slotProps.entry.id }
+                        }
+                      }
+                    },
+                    [
+                      _c(
+                        "svg",
+                        {
+                          attrs: {
+                            xmlns: "http://www.w3.org/2000/svg",
+                            viewBox: "0 0 22 16"
+                          }
+                        },
+                        [
+                          _c("path", {
+                            attrs: {
+                              d:
+                                "M16.56 13.66a8 8 0 0 1-11.32 0L.3 8.7a1 1 0 0 1 0-1.42l4.95-4.95a8 8 0 0 1 11.32 0l4.95 4.95a1 1 0 0 1 0 1.42l-4.95 4.95-.01.01zm-9.9-1.42a6 6 0 0 0 8.48 0L19.38 8l-4.24-4.24a6 6 0 0 0-8.48 0L2.4 8l4.25 4.24h.01zM10.9 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"
+                            }
+                          })
+                        ]
+                      )
+                    ]
+                  )
+                ],
+                1
+              )
+            ]
+          }
+        }
+      ])
+    },
+    [
+      _c("tr", { attrs: { slot: "table-header" }, slot: "table-header" }, [
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Ability")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Result")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Happened")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } })
+      ])
+    ]
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-0a825c16", module.exports)
+  }
+}
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-13e318c7\",\"hasScoped\":false,\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./resources/js/screens/commands/preview.vue":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -49381,6 +49550,92 @@ var render = function() {
                 {
                   name: "show",
                   rawName: "v-show",
+                  value: _vm.currentTab == "gates" && _vm.gates.length,
+                  expression: "currentTab=='gates' && gates.length"
+                }
+              ],
+              staticClass: "table table-hover table-sm mb-0"
+            },
+            [
+              _vm._m(4),
+              _vm._v(" "),
+              _c(
+                "tbody",
+                _vm._l(_vm.gates, function(entry) {
+                  return _c("tr", [
+                    _c("td", { attrs: { title: entry.content.ability } }, [
+                      _vm._v(_vm._s(_vm.truncate(entry.content.ability, 80)))
+                    ]),
+                    _vm._v(" "),
+                    _c("td", { staticClass: "table-fit" }, [
+                      _c(
+                        "span",
+                        {
+                          staticClass: "badge font-weight-light",
+                          class:
+                            "badge-" + _vm.gateResultClass(entry.content.result)
+                        },
+                        [
+                          _vm._v(
+                            "\n                        " +
+                              _vm._s(entry.content.result) +
+                              "\n                    "
+                          )
+                        ]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "td",
+                      { staticClass: "table-fit" },
+                      [
+                        _c(
+                          "router-link",
+                          {
+                            staticClass: "control-action",
+                            attrs: {
+                              to: {
+                                name: "gate-preview",
+                                params: { id: entry.id }
+                              }
+                            }
+                          },
+                          [
+                            _c(
+                              "svg",
+                              {
+                                attrs: {
+                                  xmlns: "http://www.w3.org/2000/svg",
+                                  viewBox: "0 0 22 16"
+                                }
+                              },
+                              [
+                                _c("path", {
+                                  attrs: {
+                                    d:
+                                      "M16.56 13.66a8 8 0 0 1-11.32 0L.3 8.7a1 1 0 0 1 0-1.42l4.95-4.95a8 8 0 0 1 11.32 0l4.95 4.95a1 1 0 0 1 0 1.42l-4.95 4.95-.01.01zm-9.9-1.42a6 6 0 0 0 8.48 0L19.38 8l-4.24-4.24a6 6 0 0 0-8.48 0L2.4 8l4.25 4.24h.01zM10.9 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"
+                                  }
+                                })
+                              ]
+                            )
+                          ]
+                        )
+                      ],
+                      1
+                    )
+                  ])
+                })
+              )
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "table",
+            {
+              directives: [
+                {
+                  name: "show",
+                  rawName: "v-show",
                   value: _vm.currentTab == "jobs" && _vm.jobs.length,
                   expression: "currentTab=='jobs' && jobs.length"
                 }
@@ -49388,7 +49643,7 @@ var render = function() {
               staticClass: "table table-hover table-sm mb-0"
             },
             [
-              _vm._m(4),
+              _vm._m(5),
               _vm._v(" "),
               _c(
                 "tbody",
@@ -49487,7 +49742,7 @@ var render = function() {
               staticClass: "table table-hover table-sm mb-0"
             },
             [
-              _vm._m(5),
+              _vm._m(6),
               _vm._v(" "),
               _c(
                 "tbody",
@@ -49577,7 +49832,7 @@ var render = function() {
               staticClass: "table table-hover table-sm mb-0"
             },
             [
-              _vm._m(6),
+              _vm._m(7),
               _vm._v(" "),
               _c(
                 "tbody",
@@ -49664,7 +49919,7 @@ var render = function() {
               staticClass: "table table-hover table-sm mb-0"
             },
             [
-              _vm._m(7),
+              _vm._m(8),
               _vm._v(" "),
               _c(
                 "tbody",
@@ -49736,7 +49991,7 @@ var render = function() {
               staticClass: "table table-hover table-sm mb-0"
             },
             [
-              _vm._m(8),
+              _vm._m(9),
               _vm._v(" "),
               _c(
                 "tbody",
@@ -49845,7 +50100,7 @@ var render = function() {
               staticClass: "table table-hover table-sm mb-0"
             },
             [
-              _vm._m(9),
+              _vm._m(10),
               _vm._v(" "),
               _c(
                 "tbody",
@@ -50010,6 +50265,20 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", [
+        _c("th", [_vm._v("Ability")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Result")]),
+        _vm._v(" "),
+        _c("th")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
         _c("th", [_vm._v("Job")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Status")]),
@@ -50130,7 +50399,7 @@ var render = function() {
               ]),
               _vm._v(" "),
               _c("td", { attrs: { title: slotProps.entry.content.uri } }, [
-                _vm._v(_vm._s(_vm.truncate(slotProps.entry.content.uri, 70)))
+                _vm._v(_vm._s(_vm.truncate(slotProps.entry.content.uri, 60)))
               ]),
               _vm._v(" "),
               _c("td", { staticClass: "table-fit" }, [
@@ -50152,6 +50421,14 @@ var render = function() {
                     )
                   ]
                 )
+              ]),
+              _vm._v(" "),
+              _c("td", { staticClass: "table-fit" }, [
+                slotProps.entry.content.duration
+                  ? _c("span", [
+                      _vm._v(_vm._s(slotProps.entry.content.duration) + "ms")
+                    ])
+                  : _c("span", [_vm._v("-")])
               ]),
               _vm._v(" "),
               _c(
@@ -50214,6 +50491,8 @@ var render = function() {
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Status")]),
         _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Duration")]),
+        _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Happened")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } })
@@ -50228,6 +50507,121 @@ if (false) {
   module.hot.accept()
   if (module.hot.data) {
     require("vue-hot-reload-api")      .rerender("data-v-2a5930cd", module.exports)
+  }
+}
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-2f8729aa\",\"hasScoped\":false,\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./resources/js/screens/gates/preview.vue":
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("preview-screen", {
+    attrs: {
+      title: "Gate Details",
+      resource: "gates",
+      id: _vm.$route.params.id
+    },
+    scopedSlots: _vm._u([
+      {
+        key: "table-parameters",
+        fn: function(slotProps) {
+          return [
+            _c("tr", [
+              _c("td", { staticClass: "table-fit font-weight-bold" }, [
+                _vm._v("Ability")
+              ]),
+              _vm._v(" "),
+              _c("td", [
+                _vm._v(
+                  "\n                " +
+                    _vm._s(slotProps.entry.content.ability) +
+                    "\n            "
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c("tr", [
+              _c("td", { staticClass: "table-fit font-weight-bold" }, [
+                _vm._v("Result")
+              ]),
+              _vm._v(" "),
+              _c("td", [
+                _c(
+                  "span",
+                  {
+                    staticClass: "badge font-weight-light",
+                    class:
+                      "badge-" +
+                      _vm.gateResultClass(slotProps.entry.content.result)
+                  },
+                  [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(slotProps.entry.content.result) +
+                        "\n                "
+                    )
+                  ]
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            slotProps.entry.content.file
+              ? _c("tr", [
+                  _c("td", { staticClass: "table-fit font-weight-bold" }, [
+                    _vm._v("Location")
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _vm._v(
+                      "\n                " +
+                        _vm._s(slotProps.entry.content.file) +
+                        ":" +
+                        _vm._s(slotProps.entry.content.line) +
+                        "\n            "
+                    )
+                  ])
+                ])
+              : _vm._e()
+          ]
+        }
+      },
+      {
+        key: "after-attributes-card",
+        fn: function(slotProps) {
+          return _c("div", {}, [
+            _c("div", { staticClass: "card mt-5" }, [
+              _c("div", { staticClass: "card-header" }, [
+                _c("h5", [_vm._v("Arguments")])
+              ]),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "code-bg p-4 mb-0 text-white" },
+                [
+                  _c("vue-json-pretty", {
+                    attrs: { data: slotProps.entry.content.arguments }
+                  })
+                ],
+                1
+              )
+            ])
+          ])
+        }
+      }
+    ])
+  })
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-2f8729aa", module.exports)
   }
 }
 
@@ -50285,6 +50679,58 @@ var render = function() {
           : _vm._e()
       ]
     ),
+    _vm._v(" "),
+    _vm.recordingStatus !== "enabled"
+      ? _c(
+          "p",
+          {
+            staticClass: "mt-0 mb-0 disabled-watcher d-flex align-items-center"
+          },
+          [
+            _c(
+              "svg",
+              {
+                staticClass: "mr-2",
+                attrs: {
+                  xmlns: "http://www.w3.org/2000/svg",
+                  x: "0px",
+                  y: "0px",
+                  width: "20px",
+                  height: "20px",
+                  viewBox: "0 0 90 90"
+                }
+              },
+              [
+                _c("path", {
+                  attrs: {
+                    fill: "#FFFFFF",
+                    d:
+                      "M45 0C20.1 0 0 20.1 0 45s20.1 45 45 45 45-20.1 45-45S69.9 0 45 0zM45 74.5c-3.6 0-6.5-2.9-6.5-6.5s2.9-6.5 6.5-6.5 6.5 2.9 6.5 6.5S48.6 74.5 45 74.5zM52.1 23.9l-2.5 29.6c0 2.5-2.1 4.6-4.6 4.6 -2.5 0-4.6-2.1-4.6-4.6l-2.5-29.6c-0.1-0.4-0.1-0.7-0.1-1.1 0-4 3.2-7.2 7.2-7.2 4 0 7.2 3.2 7.2 7.2C52.2 23.1 52.2 23.5 52.1 23.9z"
+                  }
+                })
+              ]
+            ),
+            _vm._v(" "),
+            _vm.recordingStatus == "disabled"
+              ? _c("span", { staticClass: "ml-1" }, [
+                  _vm._v("Telescope is currently disabled.")
+                ])
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.recordingStatus == "paused"
+              ? _c("span", { staticClass: "ml-1" }, [
+                  _vm._v("Telescope recording is paused.")
+                ])
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.recordingStatus == "off"
+              ? _c("span", { staticClass: "ml-1" }, [
+                  _vm._v("This watcher is turned off.")
+                ])
+              : _vm._e()
+          ]
+        )
+      : _vm._e(),
     _vm._v(" "),
     !_vm.ready
       ? _c(
@@ -50357,7 +50803,7 @@ var render = function() {
           "table",
           {
             staticClass:
-              "table table-hover table-sm mb-0 penultimate-column-right table-responsive",
+              "table table-hover table-sm mb-0 penultimate-column-right",
             attrs: { id: "indexScreen" }
           },
           [
@@ -51790,6 +52236,51 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "card" }, [
     _vm._m(0),
+    _vm._v(" "),
+    _vm.recordingStatus !== "enabled"
+      ? _c("p", { staticClass: "mt-0 mb-0 disabled-watcher" }, [
+          _c(
+            "svg",
+            {
+              attrs: {
+                xmlns: "http://www.w3.org/2000/svg",
+                x: "0px",
+                y: "0px",
+                width: "20px",
+                height: "20px",
+                viewBox: "0 0 90 90"
+              }
+            },
+            [
+              _c("path", {
+                attrs: {
+                  fill: "#FFFFFF",
+                  d:
+                    "M45 0C20.1 0 0 20.1 0 45s20.1 45 45 45 45-20.1 45-45S69.9 0 45 0zM45 74.5c-3.6 0-6.5-2.9-6.5-6.5s2.9-6.5 6.5-6.5 6.5 2.9 6.5 6.5S48.6 74.5 45 74.5zM52.1 23.9l-2.5 29.6c0 2.5-2.1 4.6-4.6 4.6 -2.5 0-4.6-2.1-4.6-4.6l-2.5-29.6c-0.1-0.4-0.1-0.7-0.1-1.1 0-4 3.2-7.2 7.2-7.2 4 0 7.2 3.2 7.2 7.2C52.2 23.1 52.2 23.5 52.1 23.9z"
+                }
+              })
+            ]
+          ),
+          _vm._v(" "),
+          _vm.recordingStatus == "disabled"
+            ? _c("span", { staticClass: "ml-1" }, [
+                _vm._v("Telescope is currently disabled.")
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.recordingStatus == "paused"
+            ? _c("span", { staticClass: "ml-1" }, [
+                _vm._v("Telescope recording is paused.")
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.recordingStatus == "off"
+            ? _c("span", { staticClass: "ml-1" }, [
+                _vm._v("This watcher is turned off.")
+              ])
+            : _vm._e()
+        ])
+      : _vm._e(),
     _vm._v(" "),
     !_vm.ready
       ? _c(
@@ -68601,7 +69092,9 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
                 relativeTime: {
                     future: "in %s",
                     past: "%s ago",
-                    s: 'Just now',
+                    s: function s(number) {
+                        return number + "s ago";
+                    },
                     ss: '%ds ago',
                     m: "1m ago",
                     mm: "%dm ago",
@@ -68616,7 +69109,16 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
                 }
             });
 
-            return __WEBPACK_IMPORTED_MODULE_1_moment_timezone___default()(time).fromNow(true);
+            var secondsElapsed = __WEBPACK_IMPORTED_MODULE_1_moment_timezone___default()().diff(time, 'seconds');
+            var dayStart = __WEBPACK_IMPORTED_MODULE_1_moment_timezone___default()("2018-01-01").startOf('day').seconds(secondsElapsed);
+
+            if (secondsElapsed > 300) {
+                return __WEBPACK_IMPORTED_MODULE_1_moment_timezone___default()(time).fromNow(true);
+            } else if (secondsElapsed < 60) {
+                return dayStart.format('s') + 's ago';
+            } else {
+                return dayStart.format('m:ss') + 'm ago';
+            }
         },
 
 
@@ -68999,6 +69501,10 @@ module.exports = Component.exports
             if (type === 'forget') return 'warning';
             if (type === 'missed') return 'danger';
         },
+        gateResultClass: function gateResultClass(result) {
+            if (result === 'allowed') return 'success';
+            if (result === 'denied') return 'danger';
+        },
         jobStatusClass: function jobStatusClass(status) {
             if (status === 'pending') return 'secondary';
             if (status === 'processed') return 'success';
@@ -69154,6 +69660,14 @@ module.exports = Component.exports
     path: '/monitored-tags',
     name: 'monitored-tags',
     component: __webpack_require__("./resources/js/screens/monitoring/index.vue")
+}, {
+    path: '/gates/:id',
+    name: 'gate-preview',
+    component: __webpack_require__("./resources/js/screens/gates/preview.vue")
+}, {
+    path: '/gates',
+    name: 'gates',
+    component: __webpack_require__("./resources/js/screens/gates/index.vue")
 }]);
 
 /***/ }),
@@ -69587,6 +70101,102 @@ if (false) {(function () {
     hotAPI.createRecord("data-v-159acac3", Component.options)
   } else {
     hotAPI.reload("data-v-159acac3", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+
+/***/ "./resources/js/screens/gates/index.vue":
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__("./node_modules/vue-loader/lib/component-normalizer.js")
+/* script */
+var __vue_script__ = __webpack_require__("./node_modules/babel-loader/lib/index.js?{\"cacheDirectory\":true,\"presets\":[[\"env\",{\"modules\":false,\"targets\":{\"browsers\":[\"> 2%\"],\"uglify\":true}}]],\"plugins\":[\"transform-object-rest-spread\",[\"transform-runtime\",{\"polyfill\":false,\"helpers\":false}]]}!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./resources/js/screens/gates/index.vue")
+/* template */
+var __vue_template__ = __webpack_require__("./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-0a825c16\",\"hasScoped\":false,\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./resources/js/screens/gates/index.vue")
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/js/screens/gates/index.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-0a825c16", Component.options)
+  } else {
+    hotAPI.reload("data-v-0a825c16", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+
+/***/ "./resources/js/screens/gates/preview.vue":
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__("./node_modules/vue-loader/lib/component-normalizer.js")
+/* script */
+var __vue_script__ = __webpack_require__("./node_modules/babel-loader/lib/index.js?{\"cacheDirectory\":true,\"presets\":[[\"env\",{\"modules\":false,\"targets\":{\"browsers\":[\"> 2%\"],\"uglify\":true}}]],\"plugins\":[\"transform-object-rest-spread\",[\"transform-runtime\",{\"polyfill\":false,\"helpers\":false}]]}!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./resources/js/screens/gates/preview.vue")
+/* template */
+var __vue_template__ = __webpack_require__("./node_modules/vue-loader/lib/template-compiler/index.js?{\"id\":\"data-v-2f8729aa\",\"hasScoped\":false,\"buble\":{\"transforms\":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./resources/js/screens/gates/preview.vue")
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/js/screens/gates/preview.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-2f8729aa", Component.options)
+  } else {
+    hotAPI.reload("data-v-2f8729aa", Component.options)
   }
   module.hot.dispose(function (data) {
     disposed = true
