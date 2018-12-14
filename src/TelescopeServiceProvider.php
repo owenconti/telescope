@@ -110,6 +110,7 @@ class TelescopeServiceProvider extends ServiceProvider
             Console\InstallCommand::class,
             Console\PruneCommand::class,
             Console\PublishCommand::class,
+            Console\RouteCoverage::class
         ]);
     }
 
