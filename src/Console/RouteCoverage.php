@@ -14,7 +14,7 @@ class RouteCoverage extends Command
      *
      * @var string
      */
-    protected $signature = 'route:coverage {minutes}';
+    protected $signature = 'route:coverage {minutes} {prefix?}';
 
     /**
      * The console command description.
@@ -31,6 +31,7 @@ class RouteCoverage extends Command
     public function handle()
     {
         $minutes = $this->argument('minutes');
+        $prefix = $this->argument('prefix');
 
         $telescopeEntries = DB::connection(config('telescope.storage.database.connection'))
             ->table('telescope_entries')
@@ -38,11 +39,25 @@ class RouteCoverage extends Command
             ->where('created_at', '>', Carbon::now()->subMinutes($minutes))
             ->get();
 
-        $registeredRoutes = collect(Route::getRoutes()->get());
+        $registeredRoutes = collect(Route::getRoutes()->get())
+            ->filter(function ($route) use ($prefix) {
+                if (isset($prefix) && !empty($prefix)) {
+                    return strpos($route->uri, $prefix) === 0;
+                }
 
-        $requests = $telescopeEntries->map(function ($entry) {
+                return true;
+            });
+
+        $requests = $telescopeEntries->filter(function ($entry) use ($prefix) {
             $content = json_decode($entry->content);
 
+            if (isset($prefix) && !empty($prefix)) {
+                return strpos($content->uri, $prefix) === 0;
+            }
+
+            return true;
+        })->map(function ($entry) {
+            $content = json_decode($entry->content);
             return isset($content->controller_action) ? $content->controller_action : $content->uri;
         });
 
@@ -55,7 +70,7 @@ class RouteCoverage extends Command
         if ($unconveredRoutes->isNotEmpty()) {
             $this->info('The following routes were not covered:');
 
-            $unconveredRoutes->each(function($route) {
+            $unconveredRoutes->each(function ($route) {
                 $this->info($route->uri);
             });
         }
