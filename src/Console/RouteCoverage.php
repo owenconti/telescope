@@ -61,7 +61,7 @@ class RouteCoverage extends Command
                 $type = 'uncovered';
             }
 
-            $carry[$type]->push($routeIdentifier);
+            $carry[$type]->push($route->uri);
 
             return $carry;
         }, [
@@ -73,8 +73,8 @@ class RouteCoverage extends Command
         if ($coverage['uncovered']->isNotEmpty()) {
             $this->info('The following routes were not covered:');
 
-            $coverage['uncovered']->each(function ($route) {
-                $this->info($route->uri);
+            $coverage['uncovered']->each(function ($routeUri) {
+                $this->info($routeUri);
             });
         }
 
