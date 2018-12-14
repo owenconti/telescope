@@ -48,36 +48,39 @@ class RouteCoverage extends Command
                 return true;
             });
 
-        $requests = $telescopeEntries->filter(function ($entry) use ($prefix) {
-            $content = json_decode($entry->content);
-
-            if (isset($prefix) && !empty($prefix)) {
-                return strpos($content->uri, $prefix) === 0;
-            }
-
-            return true;
-        })->map(function ($entry) {
+        $requests = $telescopeEntries->map(function ($entry) {
             $content = json_decode($entry->content);
             return isset($content->controller_action) ? $content->controller_action : $content->uri;
         });
 
-        $unconveredRoutes = $registeredRoutes->filter(function ($route) use ($requests) {
+        $coverage = $registeredRoutes->reduce(function($carry, $route) use ($requests) {
             $routeIdentifier = $this->getRouteIdentifier($route);
 
-            return !$requests->contains($routeIdentifier);
-        });
+            $type = 'covered';
+            if (!$requests->contains($routeIdentifier)) {
+                $type = 'uncovered';
+            }
 
-        if ($unconveredRoutes->isNotEmpty()) {
+            $carry[$type]->push($routeIdentifier);
+
+            return $carry;
+        }, [
+            'covered' => collect([]),
+            'uncovered' => collect([])
+        ]);
+
+
+        if ($coverage['uncovered']->isNotEmpty()) {
             $this->info('The following routes were not covered:');
 
-            $unconveredRoutes->each(function ($route) {
+            $coverage['uncovered']->each(function ($route) {
                 $this->info($route->uri);
             });
         }
 
         $this->info('Total routes registered: ' . $registeredRoutes->count());
-        $this->info('Unique requests made in the last ' . $minutes . ' minutes: ' . $requests->count());
-        $this->info('Percentage of requests hit: ' . round(($requests->count() / $registeredRoutes->count()) * 100) . '%');
+        $this->info('Unique requests made in the last ' . $minutes . ' minutes: ' . $coverage['covered']->count());
+        $this->info('Percentage of requests hit: ' . round(($coverage['covered']->count() / $registeredRoutes->count()) * 100) . '%');
     }
 
     private function getRouteIdentifier($route)
