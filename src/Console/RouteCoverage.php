@@ -74,8 +74,9 @@ class RouteCoverage extends Command
             $this->info('The following routes were not covered:');
 
             $coverage['uncovered']->each(function ($routeUri) {
-                $this->info($routeUri);
+                $this->line($routeUri);
             });
+            $this->line('');
         }
 
         $this->info('Total routes registered: ' . $registeredRoutes->count());
