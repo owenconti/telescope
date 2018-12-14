@@ -46,11 +46,19 @@ class RouteCoverage extends Command
             return isset($content->controller_action) ? $content->controller_action : $content->uri;
         });
 
-        $matchedRoutes = $registeredRoutes->filter(function ($route) use ($requests) {
+        $unconveredRoutes = $registeredRoutes->filter(function ($route) use ($requests) {
             $routeIdentifier = $this->getRouteIdentifier($route);
 
-            return $requests->contains($routeIdentifier);
+            return !$requests->contains($routeIdentifier);
         });
+
+        if ($unconveredRoutes->isNotEmpty()) {
+            $this->info('The following routes were not covered:');
+
+            $unconveredRoutes->each(function($route) {
+                $this->info($route->uri);
+            });
+        }
 
         $this->info('Total routes registered: ' . $registeredRoutes->count());
         $this->info('Unique requests made in the last ' . $minutes . ' minutes: ' . $requests->count());
