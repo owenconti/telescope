@@ -50,7 +50,8 @@ class RouteCoverage extends Command
 
         $requests = $telescopeEntries->map(function ($entry) {
             $content = json_decode($entry->content);
-            return isset($content->controller_action) ? $content->controller_action : $content->uri;
+
+            return $content->controller_action !== 'Closure' ? $content->controller_action : $content->uri;
         });
 
         $coverage = $registeredRoutes->reduce(function($carry, $route) use ($requests) {
@@ -68,7 +69,6 @@ class RouteCoverage extends Command
             'covered' => collect([]),
             'uncovered' => collect([])
         ]);
-
 
         if ($coverage['uncovered']->isNotEmpty()) {
             $this->info('The following routes were not covered:');
@@ -90,6 +90,6 @@ class RouteCoverage extends Command
             return $route->action['controller'];
         }
 
-        return $route->uri;
+        return '/' . $route->uri;
     }
 }
