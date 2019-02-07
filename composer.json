@@ -1,6 +1,6 @@
 {
-    "name": "laravel/telescope",
-    "description": "An elegant debug assistant for the Laravel framework.",
+    "name": "owenconti/telescope",
+    "description": "Fork of Laravel Telescope: An elegant debug assistant for the Laravel framework.",
     "keywords": [
         "laravel",
         "monitoring",
