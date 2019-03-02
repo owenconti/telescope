@@ -82,6 +82,13 @@ class Telescope
     ];
 
     /**
+     * The list of hidden response parameters.
+     *
+     * @var array
+     */
+    public static $hiddenResponseParameters = [];
+
+    /**
      * Indicates if Telescope should ignore events fired by Laravel.
      *
      * @var bool
@@ -101,6 +108,13 @@ class Telescope
      * @var bool
      */
     public static $shouldRecord = false;
+
+    /**
+     * Indicates if Telescope migrations will be run.
+     *
+     * @var bool
+     */
+    public static $runsMigrations = true;
 
     /**
      * Register the Telescope watchers and start recording if necessary.
@@ -613,6 +627,21 @@ class Telescope
     }
 
     /**
+     * Hide the given response parameters.
+     *
+     * @param  array  $attributes
+     * @return static
+     */
+    public static function hideResponseParameters(array $attributes)
+    {
+        static::$hiddenResponseParameters = array_merge(
+            static::$hiddenResponseParameters, $attributes
+        );
+
+        return new static;
+    }
+
+    /**
      * Specifies that Telescope should record events fired by Laravel.
      *
      * @return static
@@ -648,5 +677,17 @@ class Telescope
             'timezone' => config('app.timezone'),
             'recording' => ! cache('telescope:pause-recording'),
         ];
+    }
+
+    /**
+     * Configure Telescope to not register it's migrations.
+     *
+     * @return static
+     */
+    public static function ignoreMigrations()
+    {
+        static::$runsMigrations = false;
+
+        return new static;
     }
 }

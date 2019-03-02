@@ -52,6 +52,7 @@ class TelescopeServiceProvider extends ServiceProvider
     private function routeConfiguration()
     {
         return [
+            'domain' => config('telescope.domain', null),
             'namespace' => 'Laravel\Telescope\Http\Controllers',
             'prefix' => config('telescope.path'),
             'middleware' => 'telescope',
@@ -78,6 +79,10 @@ class TelescopeServiceProvider extends ServiceProvider
     private function registerPublishing()
     {
         if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/Storage/migrations' => database_path('migrations'),
+            ], 'telescope-migrations');
+
             $this->publishes([
                 __DIR__.'/../public' => public_path('vendor/telescope'),
             ], 'telescope-assets');
@@ -159,6 +164,6 @@ class TelescopeServiceProvider extends ServiceProvider
      */
     protected function shouldMigrate()
     {
-        return config('telescope.driver') === 'database';
+        return Telescope::$runsMigrations && config('telescope.driver') === 'database';
     }
 }
